@@ -2427,7 +2427,7 @@ class Index(IndexOpsMixin, StringAccessorMixin, PandasObject):
 
     def map(self, mapper):
         """
-        Apply mapper function to its values.
+        Apply mapper function to an index.
 
         Parameters
         ----------
@@ -2436,9 +2436,12 @@ class Index(IndexOpsMixin, StringAccessorMixin, PandasObject):
 
         Returns
         -------
-        applied : array
+        applied : Index
+            The output of the mapping function applied to the index.
         """
-        return self._arrmap(self.values, mapper)
+        attributes = self._get_attributes_dict()
+        attributes['copy'] = False
+        return Index(self._arrmap(self.values, mapper), **attributes)
 
     def isin(self, values, level=None):
         """
