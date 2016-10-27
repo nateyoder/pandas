@@ -14,7 +14,6 @@ from pandas.compat import range, u
 from pandas.compat.numpy import function as nv
 from pandas import compat
 
-
 from pandas.types.generic import ABCSeries, ABCMultiIndex, ABCPeriodIndex
 from pandas.types.missing import isnull, array_equivalent
 from pandas.types.common import (_ensure_int64,
@@ -2431,7 +2430,7 @@ class Index(IndexOpsMixin, StringAccessorMixin, PandasObject):
 
         Parameters
         ----------
-        mapper : callable
+        mapper : function, dict, or Series
             Function to be applied.
 
         Returns
@@ -2442,7 +2441,15 @@ class Index(IndexOpsMixin, StringAccessorMixin, PandasObject):
             a MultiIndex will be returned.
         """
         from .multi import MultiIndex
-        mapped_values = self._arrmap(self.values, mapper)
+
+        if isinstance(mapper, ABCSeries):
+            indexer = mapper.index.get_indexer(self._values)
+            mapped_values = algos.take_1d(mapper.values, indexer)
+        else:
+            if isinstance(mapper, dict):
+                mapper = mapper.get
+            mapped_values = self._arrmap(self._values, mapper)
+
         attributes = self._get_attributes_dict()
         if mapped_values.size and isinstance(mapped_values[0], tuple):
             return MultiIndex.from_tuples(mapped_values,

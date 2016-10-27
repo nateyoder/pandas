@@ -233,6 +233,12 @@ class TestCategoricalIndex(Base, tm.TestCase):
                                   ordered=False)
         tm.assert_index_equal(result, exp)
 
+        result = ci.map(pd.Series([10, 20, 30], index=['A', 'B', 'C']))
+        tm.assert_index_equal(result, exp)
+
+        result = ci.map({'A': 10, 'B': 20, 'C': 30})
+        tm.assert_index_equal(result, exp)
+
     def test_where(self):
         i = self.create_index()
         result = i.where(notnull(i))
