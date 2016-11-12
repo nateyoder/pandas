@@ -2991,8 +2991,15 @@ class TestDatetimeIndex(tm.TestCase):
 
         f = lambda x: x.strftime('%Y%m%d')
         result = rng.map(f)
-        exp = Index([f(x) for x in rng], dtype='<U8')
+        strs = [f(x) for x in rng]
+        exp = Index(strs, dtype='<U8')
         tm.assert_index_equal(result, exp)
+
+        s = Series(strs, index=rng.values)
+        tm.assert_index_equal(rng.map(s), exp)
+
+        d = {v: s for v, s in zip(rng.values, strs)}
+        tm.assert_index_equal(rng.map(d), exp)
 
     def test_iteration_preserves_tz(self):
 

@@ -2445,9 +2445,13 @@ class Index(IndexOpsMixin, StringAccessorMixin, PandasObject):
         if isinstance(mapper, ABCSeries):
             indexer = mapper.index.get_indexer(self._values)
             mapped_values = algos.take_1d(mapper.values, indexer)
+        elif isinstance(mapper, dict):
+            idx = Index(mapper.keys())
+            data = lib.fast_multiget(mapper, idx.values,
+                                     default=np.nan)
+            indexer = idx.get_indexer(self._values)
+            mapped_values = algos.take_1d(data, indexer)
         else:
-            if isinstance(mapper, dict):
-                mapper = mapper.get
             mapped_values = self._arrmap(self._values, mapper)
 
         attributes = self._get_attributes_dict()

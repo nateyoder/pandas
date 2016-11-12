@@ -3520,6 +3520,12 @@ class TestPeriodIndex(tm.TestCase):
         expected = index + 1
         tm.assert_index_equal(result, expected)
 
+        s = Series(expected.values, index=index.values)
+        tm.assert_index_equal(index.map(s), expected)
+
+        d = {v: s for v, s in zip(index.values, expected.values)}
+        tm.assert_index_equal(index.map(d), expected)
+
         result = index.map(lambda x: x.ordinal)
         exp = Index([x.ordinal for x in index])
         tm.assert_index_equal(result, exp)
